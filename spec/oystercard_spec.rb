@@ -4,9 +4,18 @@ describe Oystercard do
 
   it { is_expected.to respond_to(:topup).with(1).argument }
   it { is_expected.to respond_to(:deduct).with(1).argument }
+  it { is_expected.to respond_to(:touch_in) }
+  it { is_expected.to respond_to(:touch_out) }
+
   describe "#balance" do
     it "should return the balance of the card" do
       expect(subject.balance).to eq(0)
+    end
+  end
+
+  describe "#in_journey?" do
+    it "should return false" do
+      expect(subject.in_journey?).to eq(false)
     end
   end
 
@@ -25,9 +34,24 @@ describe Oystercard do
   end
 
   describe "#deduct" do
-    it "should deduct an amonunt from the balance" do
-      subject.topup(100)
+    it "should deduct an amount from the balance" do
+      subject.topup(Oystercard::MAX_LIMIT)
       expect{ subject.deduct 10 }.to change{ subject.balance }.by -10
+    end
+  end
+
+  describe "#touch_in" do
+    it "should change in_journey to true" do
+      subject.touch_in
+      expect(subject).to be_in_journey
+    end
+  end
+
+  describe "#touch_out" do
+    it "should change in_journey to false" do
+      subject.touch_in
+      subject.touch_out
+      expect(subject).not_to be_in_journey
     end
   end
 
