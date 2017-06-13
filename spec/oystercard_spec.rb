@@ -6,11 +6,9 @@ describe Oystercard do
   let(:exit_station) { double(:waterloo) }
 
   it { is_expected.to respond_to(:topup).with(1).argument }
-  # it { is_expected.to respond_to(:deduct).with(1).argument }
   it { is_expected.to respond_to(:touch_in).with(1).argument }
   it { is_expected.to respond_to(:touch_out).with(1).argument }
   it { is_expected.to respond_to(:entry_station) }
-  # it { is_expected.to respond_to(:exit_station) }
   it { is_expected.to respond_to(:previous_journeys)}
 
   describe "#balance" do
@@ -39,26 +37,24 @@ describe Oystercard do
 
   end
 
-  # describe "#deduct" do
-  #   it "should deduct an amount from the balance" do
-  #     subject.topup(Oystercard::MAX_LIMIT)
-  #     expect{ subject.deduct 10 }.to change{ subject.balance }.by -10
-  #   end
-  # end
 
   describe "#touch_in" do
-    it "should change in_journey to true" do
-      subject.topup(Oystercard::MIN_FARE)
-      subject.touch_in(station)
-      expect(subject).to be_in_journey
-    end
+    context "starting journey" do
 
-    it "should record the station to entry_station" do
-      subject.topup(Oystercard::MIN_FARE)
-      subject.touch_in(station)
-      expect(subject.entry_station).to eq(station)
-    end
+      before do
+        subject.topup(Oystercard::MIN_FARE)
+        subject.touch_in(station)
+      end
 
+      it "should change in_journey to true" do
+        expect(subject).to be_in_journey
+      end
+
+      it "should record the station to entry_station" do
+        expect(subject.entry_station).to eq(station)
+      end
+
+    end
     context "Not enough money on card" do
       it "should raise an error" do
         expect{ subject.touch_in(station) }.to raise_error("Please top up")
@@ -67,26 +63,34 @@ describe Oystercard do
   end
 
   describe "#touch_out" do
-    before do
-      subject.topup(Oystercard::MIN_FARE)
-      subject.touch_in(station)
-      subject.touch_out(exit_station)
+    context "finishing journey" do
+
+      before do
+        subject.topup(Oystercard::MIN_FARE)
+        subject.touch_in(station)
+        subject.touch_out(exit_station)
+      end
+
+      it "should change in_journey to false" do
+        expect(subject).not_to be_in_journey
+      end
+
+      it "records the journey" do
+        expect(subject.previous_journeys.last).to eq ({entry: station, exit: exit_station})
+      end
+
+      it "should set entry_station to nil" do
+        expect(subject.entry_station).to be_nil
+      end
+
     end
 
-    it "should change in_journey to false" do
-      expect(subject).not_to be_in_journey
-    end
-
-    it "records the journey" do
-      expect(subject.previous_journeys.last).to eq ({entry: station, exit: exit_station})
-    end
-
-    it "should set entry_station to nil" do
-      expect(subject.entry_station).to be_nil
-    end
-
-    it "should deduct my balance by the fare amount" do
-      expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by -Oystercard::MIN_FARE
+    context "after journey" do
+      it "should deduct my balance by the fare amount" do
+        subject.topup(Oystercard::MIN_FARE)
+        subject.touch_in(station)
+        expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by -Oystercard::MIN_FARE
+      end
     end
 
   end
