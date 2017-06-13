@@ -42,13 +42,21 @@ describe Oystercard do
 
   describe "#touch_in" do
     it "should change in_journey to true" do
+      subject.topup(Oystercard::MIN_FARE)
       subject.touch_in
       expect(subject).to be_in_journey
+    end
+
+    context "Not enough money on card" do
+      it "should raise an error" do
+        expect { subject.touch_in }.to raise_error("Please top up")
+      end
     end
   end
 
   describe "#touch_out" do
     it "should change in_journey to false" do
+      subject.topup(Oystercard::MIN_FARE)
       subject.touch_in
       subject.touch_out
       expect(subject).not_to be_in_journey
