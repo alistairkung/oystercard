@@ -19,7 +19,7 @@ describe Oystercard do
     end
   end
 
-  pending "#in_journey?" do
+  describe "#in_journey?" do
     it "should return false" do
       expect(subject.in_journey?).to eq(false)
     end
@@ -48,7 +48,7 @@ describe Oystercard do
         subject.touch_in(station)
       end
 
-      pending "should change in_journey to true" do
+      it "should change in_journey to true" do
         expect(subject).to be_in_journey
       end
 

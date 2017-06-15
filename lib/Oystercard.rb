@@ -20,7 +20,7 @@ class Oystercard
   end
 
   def in_journey?
-    !!entry_station
+    !!journey
   end
 
   def touch_in(station)
@@ -33,6 +33,7 @@ class Oystercard
     deduct(MIN_FARE)
     var = journey.record_journey(@entry_station, station)
     @previous_journeys.push var
+    @journey = nil
   end
 
   private
