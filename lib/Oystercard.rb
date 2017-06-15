@@ -1,14 +1,17 @@
+require_relative 'Journey'
+
 class Oystercard
 
-  attr_reader :balance, :entry_station, :previous_journeys
+  attr_reader :balance, :entry_station, :previous_journeys, :journey
 
   MAX_LIMIT = 100
   MIN_FARE = 1
 
   def initialize(balance = 0)
     @balance           = balance
-    @entry_station     = nil
+    # @entry_station     = nil
     @previous_journeys = []
+    @journey
   end
 
   def topup(amount)
@@ -22,13 +25,14 @@ class Oystercard
 
   def touch_in(station)
     raise "Please top up" if @balance < MIN_FARE
-    @entry_station = station
+    # @entry_station = station
+    @journey = Journey.new(station)
   end
 
   def touch_out(station)
     deduct(MIN_FARE)
-    record_journey(entry_station, station)
-    @entry_station = nil
+    var = journey.record_journey(@entry_station, station)
+    @previous_journeys.push var
   end
 
   private
@@ -36,8 +40,8 @@ class Oystercard
     @balance-= amount
   end
 
-  def record_journey(entry_station, exit_station)
-    journey = { entry: entry_station, exit: exit_station }
-    @previous_journeys.push journey
-  end
+  # def record_journey(entry_station, exit_station)
+  #   journey = { entry: entry_station, exit: exit_station }
+  #   @previous_journeys.push journey
+  # end
 end

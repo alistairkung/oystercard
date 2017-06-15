@@ -4,12 +4,14 @@ describe Oystercard do
 
   let(:station) { double(:kings_cross) }
   let(:exit_station) { double(:waterloo) }
+  let(:journey) { double(:entry => station, :exit_station => exit_station) }
 
   it { is_expected.to respond_to(:topup).with(1).argument }
   it { is_expected.to respond_to(:touch_in).with(1).argument }
   it { is_expected.to respond_to(:touch_out).with(1).argument }
   it { is_expected.to respond_to(:entry_station) }
   it { is_expected.to respond_to(:previous_journeys)}
+  it { is_expected.to respond_to(:journey) }
 
   describe "#balance" do
     it "should return the balance of the card" do
@@ -17,7 +19,7 @@ describe Oystercard do
     end
   end
 
-  describe "#in_journey?" do
+  pending "#in_journey?" do
     it "should return false" do
       expect(subject.in_journey?).to eq(false)
     end
@@ -46,12 +48,16 @@ describe Oystercard do
         subject.touch_in(station)
       end
 
-      it "should change in_journey to true" do
+      pending "should change in_journey to true" do
         expect(subject).to be_in_journey
       end
 
-      it "should record the station to entry_station" do
-        expect(subject.entry_station).to eq(station)
+      # it "should record the station to entry_station" do
+      #   expect(subject.entry_station).to eq(station)
+      # end
+
+      it "should create a new instance of Journey" do
+        expect(subject.journey).to be_an_instance_of(Journey)
       end
 
     end
@@ -76,7 +82,7 @@ describe Oystercard do
       end
 
       it "records the journey" do
-        expect(subject.previous_journeys.last).to eq ({entry: station, exit: exit_station})
+        expect(subject.previous_journeys.last).to eq({:entry=> station, :exit => exit_station})
       end
 
       it "should set entry_station to nil" do
